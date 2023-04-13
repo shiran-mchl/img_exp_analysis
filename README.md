@@ -1,1 +1,1 @@
-Code for data analysis for imaging experiments.
+Code for the data analysis of imaging experiments.
