@@ -1,1 +1,3 @@
 src/__pycache__/*
+exp_data/data_user_input.txt
+exp_data/data_user_input_large.txt

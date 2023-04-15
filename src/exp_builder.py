@@ -92,6 +92,8 @@ class ExperimentBuilder:
         self.trial_times = self.trial_times[1:]
         # Add a large time after the last trial to make sure the last trial is included
         self.trial_times += [timedelta(seconds=10000000000000)]
+    
+    # def set_trial_times_from_indices(self, indices: list):
         
     # Add a new column to the results dataframe with the trial number according to the trial times list
     # The results sampling rate is the roi sampling rate
