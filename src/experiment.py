@@ -13,6 +13,7 @@ class Experiment:
         self.session_id = session_id
         # Dataframe for holding the results
         self.results = None
+        self.external_data = None
         self.training_data = None
         self.number_of_rois = None
     
@@ -21,6 +22,9 @@ class Experiment:
     
     def set_training_data(self, training_data: pd.DataFrame):
         self.training_data = training_data
+
+    def set_external_data(self, external_data: pd.DataFrame):
+        self.external_data = external_data
     
     def set_number_of_rois(self, number_of_rois: int):
         self.number_of_rois = number_of_rois
@@ -40,4 +44,8 @@ class Experiment:
     # Get activity for all rois for a given trial number
     def get_trial_activity(self, trial_number: int):
         return self.results[self.results['trial_number'] == trial_number][[f'{roi_column_prefix}{i+1}' for i in range(self.number_of_rois)]].values
-        
+
+    # Get external data
+    def get_external_data_results(self):
+        return self.external_data
+    

@@ -73,12 +73,12 @@ class ExperimentBuilder:
     # the roi results size acording to the size of the current results dataframe
     def read_external_data_results(self, file_path: str):
         assert self.results is not None, 'ROI results must be read before external data results'
-        df = pd.read_csv(file_path, delimiter=get_delimiter(ExperimentResultsType.external_data_results))
+        self.external_data = pd.read_csv(file_path, delimiter=get_delimiter(ExperimentResultsType.external_data_results))
         # TODO: we assume that both dataframes represent the same time interval
-        sampling_positions = np.linspace(0, df.shape[0], self.results.shape[0], endpoint=False, dtype=int)
-        df = df.iloc[sampling_positions, :]
+        sampling_positions = np.linspace(0, self.external_data.shape[0], self.results.shape[0], endpoint=False, dtype=int)
+        self.external_data = self.external_data.iloc[sampling_positions, :]
         # extend the results dataframe with the external data
-        self.results = pd.concat([self.results.reset_index(drop=True), df.reset_index(drop=True)], axis=1)
+        self.results = pd.concat([self.results.reset_index(drop=True), self.external_data.reset_index(drop=True)], axis=1)
         
     
     # Gets a column dataframe of the trial times and sets the trial times list.
@@ -114,6 +114,7 @@ class ExperimentBuilder:
         exp = Experiment(self.experiment_description, None, self.session_id)
         exp.set_results(self.results)
         exp.set_training_data(self.training_data)
+        exp.set_external_data(self.external_data)   
         exp.set_number_of_rois(self.number_of_rois)
         self.add_trial_number_column()
         return exp
@@ -134,3 +135,4 @@ if __name__ == "__main__":
     # print every 100 row of the results dataframe with no truncation
     pd.set_option('display.max_rows', None)
     print(exp.results.iloc[::100, :])
+    print(exp.external_data.iloc[::100, :])
