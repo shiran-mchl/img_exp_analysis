@@ -35,6 +35,8 @@ class ExperimentBuilder:
         self.results = None
         # Training data dataframe
         self.training_data = None
+        # Number of rois
+        self.number_of_rois = None
         
     # Add a file to read for the experiment
     def add_file_to_read(self, file_path: str, results_type: ExperimentResultsType):
@@ -61,6 +63,7 @@ class ExperimentBuilder:
     def read_roi_results(self, file_path: str):
         df = pd.read_csv(file_path, delimiter=get_delimiter(ExperimentResultsType.roi_results))
         df = df.iloc[:, 1:]
+        self.number_of_rois = df.shape[1]
         if self.results is None:
             self.results = df
         else:
@@ -83,16 +86,12 @@ class ExperimentBuilder:
     # Normailizes the trial times to the first trial time
     def set_trial_times(self, df: pd.DataFrame):
         self.trial_times = df['mouseEntryTime'].tolist()
-        for i,t in enumerate(self.trial_times):
-            print(i,t)
         self.trial_times = [pd.to_datetime(time) for time in self.trial_times]
         self.trial_times = [time - self.trial_times[0] for time in self.trial_times]
         # Remove the first trial time, which is 0
         self.trial_times = self.trial_times[1:]
         # Add a large time after the last trial to make sure the last trial is included
         self.trial_times += [timedelta(seconds=10000000000000)]
-        for i,t in enumerate(self.trial_times):
-            print(i,t)
         
     # Add a new column to the results dataframe with the trial number according to the trial times list
     # The results sampling rate is the roi sampling rate
@@ -115,6 +114,7 @@ class ExperimentBuilder:
         exp = Experiment(self.experiment_description, None, self.session_id)
         exp.set_results(self.results)
         exp.set_training_data(self.training_data)
+        exp.set_number_of_rois(self.number_of_rois)
         self.add_trial_number_column()
         return exp
     
