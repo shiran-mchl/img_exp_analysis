@@ -30,4 +30,7 @@ class ConfigParams:
     # Get path training data file
     def get_training_data_path(self):
         return os.path.join(self.exp_data_folder, self.training_data_path)
-    
+
+# Utility params
+# TODO: Consider asserting that this is indeed the prefix of the roi activity columns
+roi_column_prefix = 'Mean'
