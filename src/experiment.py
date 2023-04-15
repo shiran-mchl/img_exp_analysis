@@ -40,4 +40,4 @@ class Experiment:
     # Get activity for all rois for a given trial number
     def get_trial_activity(self, trial_number: int):
         return self.results[self.results['trial_number'] == trial_number][[f'{roi_column_prefix}{i+1}' for i in range(self.number_of_rois)]].values
-        
+
