@@ -7,11 +7,11 @@ class ConfigParams:
         self.exp_data_folder = 'exp_data'
         # Path to roi file
         self.roi_path = '02_stable_Results.csv'
-        self.roi_sampling_rate = 20
+        self.roi_sampling_rate = 40
         # path to external data file
         self.external_data_path = 'data_user_input.txt'
         # TODO: Verify external data sampling rate
-        self.external_data_sampling_rate = 420
+        self.external_data_sampling_rate = 12000
         # path to training data file
         self.training_data_path = 'TrainingBox4_2022-11-02-modified.csv'
         # session id
