@@ -48,4 +48,4 @@ class Experiment:
     # Get external data
     def get_external_data_results(self):
         return self.external_data
-    
+
