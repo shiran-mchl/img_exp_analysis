@@ -9,7 +9,7 @@ class ConfigParams:
         self.roi_path = '02_stable_Results.csv'
         self.roi_sampling_rate = 40
         # path to external data file
-        self.external_data_path = 'data_user_input.txt'
+        self.external_data_path = 'data_user_input_large.txt'
         # TODO: Verify external data sampling rate
         self.external_data_sampling_rate = 12000
         # path to training data file
