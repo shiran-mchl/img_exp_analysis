@@ -1,9 +1,11 @@
 from datetime import timedelta
 from enum import Enum
+from functools import reduce
 import pandas as pd
 import numpy as np
 from experiment import Experiment
 from exp_config import ConfigParams
+from utils import get_locations_of_differences
 
 # An enum representing the different types of experiments results files
 class ExperimentResultsType(Enum):
@@ -29,8 +31,10 @@ class ExperimentBuilder:
         self.roi_sampling_rate = roi_sampling_rate
         # List of files to read for the experiment
         self.files_to_read = []
-        # Trial times list
-        self.trial_times = []
+        # Trial times list. Deprecated for now until the trial times in the user data file will be fixed.
+        self.trial_times = None
+        # Trial start indices list. Infered from the external data file until the trial times will be fixed.
+        self.trial_start_indices = None
         # Results dataframe
         self.results = None
         # Training data dataframe
@@ -56,6 +60,7 @@ class ExperimentBuilder:
     def read_training_data_results(self, file_path: str):
         df = pd.read_csv(file_path, delimiter=get_delimiter(ExperimentResultsType.training_data_results))
         df = df[df['session_id'] == self.session_id].reset_index(drop=True)
+        # Set the trial times list, doesn't work for now because the trial times in the user data file are wrong.
         self.set_trial_times(df)
         self.training_data = df
     
@@ -84,6 +89,7 @@ class ExperimentBuilder:
     # Gets a column dataframe of the trial times and sets the trial times list.
     # Converts the trial times from a string to a datetime object
     # Normailizes the trial times to the first trial time
+    # Deprecated. See the comment in the trial_times variable.
     def set_trial_times(self, df: pd.DataFrame):
         self.trial_times = df['mouseEntryTime'].tolist()
         self.trial_times = [pd.to_datetime(time) for time in self.trial_times]
@@ -93,11 +99,15 @@ class ExperimentBuilder:
         # Add a large time after the last trial to make sure the last trial is included
         self.trial_times += [timedelta(seconds=10000000000000)]
     
-    # def set_trial_times_from_indices(self, indices: list):
-        
+    # Sets the trial start indices list according to the training data file.
+    def set_trial_start_indices(self):
+        assert self.training_data is not None, 'Training data must be read before setting trial start indices'
+        self.trial_start_indices = [0] + get_locations_of_differences(self.results['E-phys'], threshold=1, greater_than=False)
+
     # Add a new column to the results dataframe with the trial number according to the trial times list
     # The results sampling rate is the roi sampling rate
-    def add_trial_number_column(self):
+    # Deprecated. See the comment in the trial_times variable.
+    def add_trial_number_column_by_trial_times(self):
         assert self.results is not None, 'ROI results must be read before adding trial number column'
         assert self.trial_times is not None, 'Trial times must be read before adding trial number column'
         trial_number = []
@@ -110,15 +120,25 @@ class ExperimentBuilder:
                 current_trial += 1
         self.results['trial_number'] = trial_number
 
+    # Add a new column to the results dataframe with the trial number according to the trial indices list
+    def add_trial_number_column_by_trial_indices(self):
+        assert self.results is not None, 'ROI results must be read before adding trial number column'
+        assert self.trial_start_indices is not None, 'Trial start indices must be read before adding trial number column'
+        trial_number = [[i]*(self.trial_start_indices[i]  - self.trial_start_indices[i-1]) for i in range(1,len(self.trial_start_indices))]
+        trial_number = reduce(lambda x,y: x+y, trial_number)
+        trial_number += [trial_number[-1]]*(self.results.shape[0] - len(trial_number))
+        self.results['trial_number'] = trial_number
+
     # Read all the files and create an experiment object
     def get_experiment(self):
         self.read_files()
+        self.set_trial_start_indices()
+        self.add_trial_number_column_by_trial_indices()
         exp = Experiment(self.experiment_description, None, self.session_id)
         exp.set_results(self.results)
         exp.set_training_data(self.training_data)
         exp.set_external_data(self.external_data)   
         exp.set_number_of_rois(self.number_of_rois)
-        self.add_trial_number_column()
         return exp
     
 
