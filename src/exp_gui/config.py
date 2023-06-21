@@ -3,14 +3,16 @@ class ConfigParams:
         # exp data folder
         self.exp_data_folder = 'exp_data'
         # tunnel ID
-        tunnel_id = 'pinkPort'
+        self.tunnel_id = 'pinkPort'
         # training day
-        training_day = '2023-05-30'
+        self.training_day = '2023-06-06'
         # trial type
-        trial_type = 'Reward'
+        self.trial_type = 'Reward'
         # path to training data file
-        self.training_data_path = 'pinkPort_2023-05-30'
+        self.training_data_path = 'src/exp_gui/exp_data/pinkPort_2023-06-06.csv'
         # trained mice
         self.trained_mice = ['R13', 'R14', 'R15', 'R17']
         # Description of the experiment
         self.experiment_description = 'test training data'
+
+
